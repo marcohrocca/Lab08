@@ -30,6 +30,7 @@ class Distributore:
     def __repr__(self):
         return f"{self.id} | {self.nome} | Indirizzo: {self.indirizzo}"
 
+
 '''
 if __name__ == '__main__':
     print(PrezzoDAO().get_prezzi(1))

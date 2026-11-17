@@ -1,5 +1,4 @@
 from database.distributore_DAO import DistributoreDAO
-from datetime import datetime #Importo librerai tempo per estrarre i mesi
 '''
     MODELLO:
     - Rappresenta la struttura dati
@@ -66,7 +65,46 @@ class Model:
 
     def __ricorsione(self, sequenza_parziale, giorno, ultimo_distributore, costo_corrente, prezzi_settimana):
         """ Implementa la ricorsione """
-        # TODO
+
+        #Questa funzione viene chiamata da get_sequenza_ottima
+        if giorno>7: #condizione di terminazione della ricorsione,non viene più chiamata la funzione
+            #Se giorno>7 abbiamo finito di calcolare la sequenza e possiamo restituire il suo valore
+            if self.__costo_ottimo==-1 or self.__costo_ottimo>costo_corrente:
+                self.__costo_ottimo=costo_corrente
+                self.__sequenza_ottima=list(sequenza_parziale)   #Devo mettere list perchè ricorsione
+                                                                #cancellerà sequenza_parziale ho bisogno di copia
+            return self.__sequenza_ottima, self.__costo_ottimo
+
+        else:   #Qui viene richiamata la funzione
+                #Il costo viene calcolato così,se il distributore è uguale al precedente
+                #costo=prezzo_giorno*100 se è diverso costo=prezzo_giorno*100+5
+                #La ricorsione calcolerà possibilità su tutti i 7 giorni circa 2 alla 7 e
+                # confronterà tra loro le sequenze per scegliere quella con valore minore
+
+            for id_distributore in prezzi_settimana:
+                # :return: un dizionario: {id_distributore: [prezzo_giorno1, ..., prezzo_giorno7]}
+                costo=prezzi_settimana[id_distributore][giorno-1]*100  #Prezzo al litro per 100
+                #Penalità scatta se non è il primo giorno ed è cambiato distributore
+                if ultimo_distributore is not None and ultimo_distributore!=id_distributore:
+                    #Significa se è primo giorno o è uguale allora no penalità
+                    costo=costo+5 #Il costo per cambiare distributore
+
+                #Non posso cambiare valore nel for sennò per a nessun problema,alla
+                #seconda del for nella stessa ricorsione ovvero b avrò un giorno in più costo maggiore
+                #oltre a list index out of range
+                '''costo_corrente+=costo
+                giorno+=1
+                ultimo_distributore=sequenza_parziale[-1]'''
+                sequenza_parziale.append(id_distributore)
+
+                self.__ricorsione(sequenza_parziale,giorno+1,sequenza_parziale[-1], costo_corrente+costo, prezzi_settimana)
+                sequenza_parziale.pop()
+            return None
+
+
+
+
+
 
     def __get_prezzi_prima_settimana_mese(self, mese: int):
         """
